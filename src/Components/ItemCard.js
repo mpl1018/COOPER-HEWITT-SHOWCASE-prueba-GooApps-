@@ -1,18 +1,26 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { Button, Card } from 'react-native-elements';
+import LinearGradient from 'react-native-linear-gradient';
 
-export default function App ({title, img}) {
+export default function App ({title, img, des}) {
     return (
         <Card
         title={title}
         image={{uri: img}}>
         <Text style={{marginBottom: 10}}>
-            The idea with React Native Elements is more about component structure than actual design.
+            {des.toUpperCase()}
         </Text>
         <Button
             buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
-            title='MORE INFO' />
+            title='MORE INFO' 
+            ViewComponent={LinearGradient} // Don't forget this!
+            linearGradientProps={{
+              colors: ['grey', 'black'],
+              start: { x: 0, y: 0.5 },
+              end: { x: 1, y: 0.5 },
+            }}/>
+
         </Card>
     );
 

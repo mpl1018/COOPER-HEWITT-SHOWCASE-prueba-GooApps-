@@ -33,7 +33,8 @@ export default class App extends Component {
         let obj = {
           id: element.id,
           title: element.title, 
-          img: resImgJSON.images[0].n.url
+          img: resImgJSON.images[0].n.url,
+          des: element.medium
         }
         listItems.push(obj)
       }
@@ -54,7 +55,11 @@ export default class App extends Component {
   render() {
     if(this.state.isLoading){
       return(
-        <View style={{flex: 1, padding: 20}}>
+        <View style={styles.container}>
+          <Header
+            centerComponent={{ text: 'COPER HEWITT', style: styles.headerTitle }}
+            backgroundColor='black'
+          />
           <ActivityIndicator/>
         </View>
       )
@@ -63,11 +68,12 @@ export default class App extends Component {
     return (
       <View style={styles.container}>
         <Header
-          centerComponent={{ text: 'COPER HEWITT', style: { color: '#fff' } }}
+          centerComponent={{ text: 'COOPER HEWITT', style: styles.headerTitle }}
+          backgroundColor='black'
         />
         <FlatList
           data={this.state.dataSource}
-          renderItem={({ item }) => <Item title={item.title} img={item.img} />}
+          renderItem={({ item }) => <Item title={item.title} img={item.img} des={item.des} />}
           keyExtractor={item => item.id}
         />
       </View>
