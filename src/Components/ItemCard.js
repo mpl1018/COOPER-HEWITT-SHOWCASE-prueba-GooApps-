@@ -4,7 +4,6 @@ import { Button, Card } from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
 
 export default function App ({title, img, des, url}) {
-    console.log(url);
     return (
         <Card
         title={title}

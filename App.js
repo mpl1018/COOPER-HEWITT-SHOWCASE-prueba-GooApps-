@@ -12,6 +12,8 @@ export default class App extends Component {
     this.state ={ 
       isLoading: true,
       dataSource: [], 
+      rawJSONdata: [],
+      itemLastCalled: 0,
     }
   }
 
@@ -23,9 +25,25 @@ export default class App extends Component {
   async getData() {
     try {
       let response = await fetch(`https://api.collection.cooperhewitt.org/rest/?method=cooperhewitt.objects.getOnDisplay&access_token=${API_KEY}`)
-      let responseJSON = await response.json();
+      let responseJSON = await response.json();      
+      this.setState({
+        rawJSONdata: responseJSON
+      })
+      await this.getImages(); 
+
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  async getImages() {
+    try{
       let listItems = [];
-      let elementArray = responseJSON.objects.slice(0, 5)
+      let newRender = this.state.itemLastCalled + 5
+      console.log ("antes: " + this.state.itemLastCalled + "; despues: " + newRender)
+      let elementArray = this.state.rawJSONdata.objects.slice(this.state.itemLastCalled, newRender)
+      ++newRender;
+      this.setState({itemLastCalled: newRender})
       for (let element of elementArray) {
         let resImg = await fetch(`https://api.collection.cooperhewitt.org/rest/?method=cooperhewitt.objects.getImages&access_token=${API_KEY}&object_id=${element.id}`); 
         let resImgJSON = await resImg.json();
@@ -39,17 +57,16 @@ export default class App extends Component {
         }
         listItems.push(obj)
       }
+      listItems = this.state.dataSource.concat(listItems);
       this.setState({
         dataSource : listItems, 
         isLoading: false,
       })
       
-
-    } catch (error) {
+    } catch {
       console.error(error)
     }
   }
-
 
   
 
@@ -58,7 +75,7 @@ export default class App extends Component {
       return(
         <View style={styles.container}>
           <Header
-            centerComponent={{ text: 'COPER HEWITT', style: styles.headerTitle }}
+            centerComponent={{ text: 'COOPER HEWITT', style: styles.headerTitle }}
             backgroundColor='black'
           />
           <ActivityIndicator/>
@@ -76,11 +93,12 @@ export default class App extends Component {
           data={this.state.dataSource}
           renderItem={({ item }) => <Item title={item.title} img={item.img} des={item.des} url={item.url} />}
           keyExtractor={item => item.id}
-          onEndReached={({ distanceFromEnd }) => {
+          onEndReached={ ({ distanceFromEnd }) => {
             if (distanceFromEnd < 0) return;
-            console.error("holaaa")
+            this.getImages();
           }}
-          onEndReachedThreshold={0.7}
+          onEndReachedThreshold={0.5}
+          extraData={this.state}
         />
       </View>
     );
