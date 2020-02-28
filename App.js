@@ -1,39 +1,77 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, ActivityIndicator, FlatList } from 'react-native';
 import { Button, Header, Card, ListItem, Icon } from 'react-native-elements';
 
+import styles from './src/Styles'
+import { API_KEY } from 'react-native-dotenv'
+import Item from './src/Components/ItemCard'
+
 export default class App extends Component {
+  constructor(props){
+    super(props);
+    this.state ={ 
+      isLoading: true,
+      dataSource: [], 
+    }
+  }
+
+
+  componentDidMount() {
+    this.getData()      
+  }
+  
+  async getData() {
+    try {
+      let response = await fetch(`https://api.collection.cooperhewitt.org/rest/?method=cooperhewitt.objects.getOnDisplay&access_token=${API_KEY}`)
+      let responseJSON = await response.json();
+      let listItems = [];
+      let elementArray = responseJSON.objects.slice(1, 6)
+      for (let element of elementArray) {
+        let resImg = await fetch(`https://api.collection.cooperhewitt.org/rest/?method=cooperhewitt.objects.getImages&access_token=${API_KEY}&object_id=${element.id}`); 
+        let resImgJSON = await resImg.json();
+
+        let obj = {
+          id: element.id,
+          title: element.title, 
+          img: resImgJSON.images[0].n.url
+        }
+        listItems.push(obj)
+      }
+      this.setState({
+        dataSource : listItems, 
+        isLoading: false,
+      })
+      
+
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+
   
 
   render() {
+    if(this.state.isLoading){
+      return(
+        <View style={{flex: 1, padding: 20}}>
+          <ActivityIndicator/>
+        </View>
+      )
+    }
+
     return (
       <View style={styles.container}>
-      <Header
-  leftComponent={{ icon: 'menu', color: '#fff' }}
-  centerComponent={{ text: 'MY TITLE', style: { color: '#fff' } }}
-  rightComponent={{ icon: 'home', color: '#fff' }}
-/>
-  <Card
-  title='HELLO WORLD'
-  image={{uri: "https://s3.amazonaws.com/uifaces/faces/twitter/brynn/128.jpg"}}>
-  <Text style={{marginBottom: 10}}>
-    The idea with React Native Elements is more about component structure than actual design.
-  </Text>
-  <Button
-    icon={<Icon name='code' color='#ffffff' />}
-    buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
-    title='VIEW NOW' />
-</Card>
+        <Header
+          centerComponent={{ text: 'COPER HEWITT', style: { color: '#fff' } }}
+        />
+        <FlatList
+          data={this.state.dataSource}
+          renderItem={({ item }) => <Item title={item.title} img={item.img} />}
+          keyExtractor={item => item.id}
+        />
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    paddingTop: 0,
-    backgroundColor: '#ecf0f1',
-  }
-});
