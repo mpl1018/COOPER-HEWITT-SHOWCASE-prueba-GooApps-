@@ -25,7 +25,7 @@ export default class App extends Component {
       let response = await fetch(`https://api.collection.cooperhewitt.org/rest/?method=cooperhewitt.objects.getOnDisplay&access_token=${API_KEY}`)
       let responseJSON = await response.json();
       let listItems = [];
-      let elementArray = responseJSON.objects.slice(1, 6)
+      let elementArray = responseJSON.objects.slice(0, 5)
       for (let element of elementArray) {
         let resImg = await fetch(`https://api.collection.cooperhewitt.org/rest/?method=cooperhewitt.objects.getImages&access_token=${API_KEY}&object_id=${element.id}`); 
         let resImgJSON = await resImg.json();
@@ -34,7 +34,8 @@ export default class App extends Component {
           id: element.id,
           title: element.title, 
           img: resImgJSON.images[0].n.url,
-          des: element.medium
+          des: element.medium,
+          url: element.url
         }
         listItems.push(obj)
       }
@@ -73,8 +74,13 @@ export default class App extends Component {
         />
         <FlatList
           data={this.state.dataSource}
-          renderItem={({ item }) => <Item title={item.title} img={item.img} des={item.des} />}
+          renderItem={({ item }) => <Item title={item.title} img={item.img} des={item.des} url={item.url} />}
           keyExtractor={item => item.id}
+          onEndReached={({ distanceFromEnd }) => {
+            if (distanceFromEnd < 0) return;
+            console.error("holaaa")
+          }}
+          onEndReachedThreshold={0.7}
         />
       </View>
     );
