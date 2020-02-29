@@ -29,7 +29,7 @@ export default class App extends Component {
       this.setState({
         rawJSONdata: responseJSON
       })
-      await this.getImages(); 
+      this.getImages(); 
 
     } catch (error) {
       console.error(error)
