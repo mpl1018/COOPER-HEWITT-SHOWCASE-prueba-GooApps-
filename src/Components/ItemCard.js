@@ -32,6 +32,7 @@ export default function App ({title, img, des, url}) {
                 }}
                 onPress={() => { Linking.openURL(url)}}
                 />
+            
             <Button
                 buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
         
