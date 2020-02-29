@@ -39,8 +39,8 @@ export default class App extends Component {
   async getImages() {
     try{
       let listItems = [];
-      let newRender = this.state.itemLastCalled + 5
-      console.log ("antes: " + this.state.itemLastCalled + "; despues: " + newRender)
+      let newRender = this.state.itemLastCalled + 10;  
+      //console.log ("antes: " + this.state.itemLastCalled + "; despues: " + newRender)
       let elementArray = this.state.rawJSONdata.objects.slice(this.state.itemLastCalled, newRender)
       ++newRender;
       this.setState({itemLastCalled: newRender})
@@ -94,7 +94,7 @@ export default class App extends Component {
           renderItem={({ item }) => <Item title={item.title} img={item.img} des={item.des} url={item.url} />}
           keyExtractor={item => item.id}
           onEndReached={ ({ distanceFromEnd }) => {
-            if (distanceFromEnd < 0) return;
+            if (distanceFromEnd < 0 || this.state.itemLastCalled + 10 >= this.state.rawJSONdata.length) return;
             this.getImages();
           }}
           onEndReachedThreshold={0.5}
